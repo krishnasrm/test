@@ -1,2 +1,7 @@
 stash-demo
 stash-demo2
+<<<<<<< Updated upstream
+stash-demo3
+=======
+git-stash5
+>>>>>>> Stashed changes
