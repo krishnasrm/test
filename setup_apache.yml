@@ -1,0 +1,113 @@
+---
+- name: Setup Apache Web Server on 192.168.1.100
+  hosts: 192.168.1.100
+  become: true
+  tasks:
+
+    - name: Check if YUM is available
+      command: which yum
+      register: yum_check
+      failed_when: yum_check.rc != 0
+
+    - name: Install Apache (httpd) if not already present
+      yum:
+        name: httpd
+        state: present
+
+    - name: Ensure httpd service is started
+      service:
+        name: httpd
+        state: started
+
+    - name: Enable httpd service at boot
+      service:
+        name: httpd
+        enabled: yes
+
+    - name: Create index.html with 'hello world'
+      copy:
+        dest: /var/www/html/index.html
+        content: "hello world\n"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart Apache to apply changes
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Confirm Apache is enabled
+      command: systemctl is-enabled httpd
+      register: enabled_status
+      changed_when: false
+
+    - name: Confirm Apache is running
+      command: systemctl is-active httpd
+      register: active_status
+      changed_when: false
+
+    - name: Show final Apache status
+      debug:
+        msg: |
+          ✅ Apache Status on 192.168.1.100
+          - Enabled at boot: {{ enabled_status.stdout }}
+          - Currently running: {{ active_status.stdout }}
+          - Access via: http://192.168.1.100
+---
+- name: Setup Apache Web Server on 192.168.1.100
+  hosts: 192.168.1.100
+  become: true
+  tasks:
+
+    - name: Check if YUM is available
+      command: which yum
+      register: yum_check
+      failed_when: yum_check.rc != 0
+
+    - name: Install Apache (httpd) if not already present
+      yum:
+        name: httpd
+        state: present
+
+    - name: Ensure httpd service is started
+      service:
+        name: httpd
+        state: started
+
+    - name: Enable httpd service at boot
+      service:
+        name: httpd
+        enabled: yes
+
+    - name: Create index.html with 'hello world'
+      copy:
+        dest: /var/www/html/index.html
+        content: "hello world\n"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart Apache to apply changes
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Confirm Apache is enabled
+      command: systemctl is-enabled httpd
+      register: enabled_status
+      changed_when: false
+
+    - name: Confirm Apache is running
+      command: systemctl is-active httpd
+      register: active_status
+      changed_when: false
+
+    - name: Show final Apache status
+      debug:
+        msg: |
+          ✅ Apache Status on 192.168.1.100
+          - Enabled at boot: {{ enabled_status.stdout }}
+          - Currently running: {{ active_status.stdout }}
+          - Access via: http://192.168.1.100
+
