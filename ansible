@@ -1,0 +1,44 @@
+- name: Partition and format the new disk for Jenkins
+  hosts: jenkins_servers
+  become: true
+  vars:
+    disk_device: /dev/sdb     # Change as appropriate
+    jenkins_mount_path: /var/lib/jenkins
+
+  tasks:
+    - name: Partition the disk
+      parted:
+        device: "{{ disk_device }}"
+        number: 1
+        state: present
+        part_end: 100%
+      register: disk_partition
+
+    - name: Create ext4 filesystem on the new partition
+      filesystem:
+        fstype: ext4
+        dev: "{{ disk_device }}1"
+
+    - name: Ensure Jenkins service is stopped before modifying home
+      service:
+        name: jenkins
+        state: stopped
+
+    - name: Mount the new partition to Jenkins directory
+      mount:
+        path: "{{ jenkins_mount_path }}"
+        src: "{{ disk_device }}1"
+        fstype: ext4
+        opts: defaults
+        state: mounted
+
+    - name: Add Jenkins mount to /etc/fstab
+      template:
+        src: fstab.j2
+        dest: /etc/fstab
+        validate: 'mount -v -t auto -O nofail {{ disk_device }}1 && mount -v {{ disk_device }}1'
+      notify: Reload fstab
+
+  handlers:
+    - name: Reload fstab
+      command: mount -a
