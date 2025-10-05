@@ -40,30 +40,10 @@
         group: root
         mode: '0644'
 
-    - name: Create index.html with greeting and krishna image
+    - name: Copy HTML code from local file (html-code) to index.html
       copy:
+        src: html-code
         dest: /var/www/html/index.html
-        content: |
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <title>Welcome to Apache Server</title>
-          </head>
-          <body>
-              <h1>Hello, Welcome to our Apache Web Server!</h1>
-
-              <img src="images/krishna.png" alt="Krishna Image" style="max-width:600px; height:auto;">
-
-              <p>Here are some useful links:</p>
-              <ul>
-                  <li><a href="https://krnetworkcloud.org/?srsltid=AfmBOopubFVT0ibGTW4A-fw724fgBt9_oVf4qd4IroSmhxxJmx6M5CO5" target="_blank">KR Network Cloud</a></li>
-                  <li><a href="https://www.youtube.com/channel/UCxxxxxxx" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
-              </ul>
-
-              <p>Have a great day!</p>
-          </body>
-          </html>
         owner: root
         group: root
         mode: '0644'
