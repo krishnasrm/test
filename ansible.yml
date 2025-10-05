@@ -9,13 +9,6 @@
     db_password: webpass
 
   tasks:
-    # Ensure YUM exists
-    - name: Check if YUM is available
-      command: which yum
-      register: yum_check
-      failed_when: yum_check.rc != 0
-
-    # Install Apache, PHP, and MariaDB (MySQL)
     - name: Install Apache, PHP, and MariaDB
       yum:
         name:
@@ -25,35 +18,32 @@
           - php-mysqlnd
         state: present
 
-    # Start and enable Apache
-    - name: Start Apache
+    - name: Start and enable Apache
       service:
         name: httpd
         state: started
         enabled: yes
 
-    # Start and enable MariaDB
-    - name: Start MariaDB
+    - name: Start and enable MariaDB
       service:
         name: mariadb
         state: started
         enabled: yes
 
-    # Create MySQL database
     - name: Create MySQL database
       community.mysql.mysql_db:
         name: "{{ db_name }}"
         state: present
+        login_user: root
 
-    # Create MySQL user
-    - name: Create MySQL user
+    - name: Create MySQL user with privileges
       community.mysql.mysql_user:
         name: "{{ db_user }}"
         password: "{{ db_password }}"
         priv: "{{ db_name }}.*:ALL"
         state: present
+        login_user: root
 
-    # Create MySQL table
     - name: Create table in database
       community.mysql.mysql_query:
         login_user: root
@@ -64,7 +54,6 @@
             email VARCHAR(100)
           );
 
-    # Deploy index.html form
     - name: Deploy index.html with form
       copy:
         dest: /var/www/html/index.html
@@ -90,7 +79,6 @@
         group: apache
         mode: '0644'
 
-    # Deploy submit.php to insert data into MySQL
     - name: Deploy submit.php script
       copy:
         dest: /var/www/html/submit.php
@@ -119,15 +107,13 @@
         group: apache
         mode: '0644'
 
-    # Restart Apache
-    - name: Restart Apache
+    - name: Restart Apache to apply changes
       service:
         name: httpd
         state: restarted
 
-    # Final status
-    - name: Display web link
+    - name: Show final status
       debug:
         msg: |
-          ✅ Setup Complete!
-          Visit the web form at: http://192.168.1.100/
+          ✅ Apache and MySQL setup complete!
+          🌐 Visit the form at: http://192.168.1.100/
