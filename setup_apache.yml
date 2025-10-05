@@ -24,15 +24,7 @@
       shell: systemctl is-active firewalld
       register: firewalld_status
       ignore_errors: yes
-
-    - name: Add HTTP port to firewall if firewalld is active
-      firewalld:
-        service: http
-        permanent: yes
-        state: enabled
-        immediate: yes
-      when: firewalld_status.stdout == "active"
-
+      
     - name: Reload firewalld if active
       service:
         name: firewalld
