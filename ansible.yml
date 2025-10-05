@@ -15,7 +15,7 @@
       register: yum_check
       failed_when: yum_check.rc != 0
 
-    # Install Apache, PHP, and MySQL (MariaDB)
+    # Install Apache, PHP, and MariaDB (MySQL)
     - name: Install Apache, PHP, and MariaDB
       yum:
         name:
@@ -41,13 +41,13 @@
 
     # Create MySQL database
     - name: Create MySQL database
-      mysql_db:
+      community.mysql.mysql_db:
         name: "{{ db_name }}"
         state: present
 
     # Create MySQL user
     - name: Create MySQL user
-      mysql_user:
+      community.mysql.mysql_user:
         name: "{{ db_user }}"
         password: "{{ db_password }}"
         priv: "{{ db_name }}.*:ALL"
@@ -55,7 +55,7 @@
 
     # Create MySQL table
     - name: Create table in database
-      mysql_query:
+      community.mysql.mysql_query:
         login_user: root
         query: |
           CREATE TABLE IF NOT EXISTS {{ db_name }}.submissions (
@@ -65,7 +65,7 @@
           );
 
     # Deploy index.html form
-    - name: Deploy form.html
+    - name: Deploy index.html with form
       copy:
         dest: /var/www/html/index.html
         content: |
@@ -90,7 +90,7 @@
         group: apache
         mode: '0644'
 
-    # Deploy submit.php to handle form data and insert into DB
+    # Deploy submit.php to insert data into MySQL
     - name: Deploy submit.php script
       copy:
         dest: /var/www/html/submit.php
@@ -119,16 +119,15 @@
         group: apache
         mode: '0644'
 
-    # Restart Apache to apply PHP setup
-    - name: Restart Apache to apply changes
+    # Restart Apache
+    - name: Restart Apache
       service:
         name: httpd
         state: restarted
 
-    # Debug final message
-    - name: Display status and link
+    # Final status
+    - name: Display web link
       debug:
         msg: |
-          ✅ Apache and MySQL are running
-          📄 Visit: http://192.168.1.100/index.html to submit data
-
+          ✅ Setup Complete!
+          Visit the web form at: http://192.168.1.100/
