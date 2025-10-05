@@ -2,8 +2,8 @@
 - name: Setup Apache Web Server on 192.168.1.100
   hosts: webserver
   become: true
-  tasks:
 
+  tasks:
     - name: Check if YUM is available
       command: which yum
       register: yum_check
@@ -24,10 +24,26 @@
         name: httpd
         enabled: yes
 
-    - name: Create index.html with 'hello world'
+    - name: Create index.html with greeting and useful links
       copy:
         dest: /var/www/html/index.html
-        content: "hello world\n"
+        content: |
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <title>Welcome to Apache Server</title>
+          </head>
+          <body>
+              <h1>Hello, Welcome to our Apache Web Server!</h1>
+              <p>Here are some useful links:</p>
+              <ul>
+                  <li><a href="https://krnetworkcloudnimanvihar.example.com" target="_blank">krnetwork cloud niman vihar</a></li>
+                  <li><a href="https://www.youtube.com/channel/UCxxxxxxx" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
+              </ul>
+              <p>Have a great day!</p>
+          </body>
+          </html>
         owner: root
         group: root
         mode: '0644'
