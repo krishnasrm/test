@@ -1,18 +1,72 @@
 ---
-- name: Setup Apache, PHP, and MySQL with a working contact form and image
+- name: Setup Apache and PHP with a working contact form and image
   hosts: webserver
   become: true
 
   vars:
-    db_name: contact_db
-    db_user: root                  # MySQL username (can be overridden)
-    db_password: '123'             # MySQL password (vault in production!)
-    allowed_host: '192.168.1.14'   # IP allowed to connect to DB
     krnetworkcloud_url: "https://krnetworkcloud.org/?srsltid=AfmBOopc_aoC7okycWr10-cdu3zZGJKH5SkzGMbVzQ6D9rLvXPbhjjWO"
     youtube_url: "https://www.youtube.com/channel/UCxxxxxxx"
 
   tasks:
-    # Your previous tasks remain the same...
+
+    - name: Check if httpd is installed
+      shell: rpm -q httpd
+      register: httpd_check
+      ignore_errors: yes
+
+    - name: Install httpd if not installed
+      yum:
+        name: httpd
+        state: present
+      when: httpd_check.rc != 0
+
+    - name: Check if firewalld is active
+      shell: systemctl is-active firewalld
+      register: firewalld_status
+      ignore_errors: yes
+
+    - name: Add HTTP port to firewall if firewalld is active
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: firewalld_status.stdout == "active"
+
+    - name: Reload firewalld if active
+      service:
+        name: firewalld
+        state: reloaded
+      when: firewalld_status.stdout == "active"
+
+    - name: Install PHP and related packages
+      yum:
+        name:
+          - php
+          - php-mysqlnd
+        state: present
+
+    - name: Start and enable Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Create images directory in web root
+      file:
+        path: /var/www/html/images
+        state: directory
+        owner: apache
+        group: apache
+        mode: '0755'
+
+    - name: Copy screenshot image to web directory
+      copy:
+        src: "cScreenshot 2025-09-14 160543.png"
+        dest: /var/www/html/images/cScreenshot_2025-09-14_160543.png
+        owner: apache
+        group: apache
+        mode: '0644'
 
     - name: Deploy contact form (index.html) with image included
       copy:
@@ -47,4 +101,39 @@
         group: apache
         mode: '0644'
 
-    # Continue rest of your playbook...
+    - name: Deploy PHP backend (submit.php)
+      copy:
+        dest: /var/www/html/submit.php
+        content: |
+          <?php
+          if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+              $name = htmlspecialchars(strip_tags(trim($_POST['name'] ?? '')));
+              $phone = trim($_POST['phone'] ?? '');
+
+              if (empty($name) || empty($phone)) {
+                  die('Name and phone are required.');
+              }
+              if (!preg_match('/^[0-9]{10}$/', $phone)) {
+                  die('Phone must be a 10-digit number.');
+              }
+
+              // Since no DB is configured, just thank user.
+              echo 'Thank you! Your info has been recorded (DB disabled).';
+          } else {
+              echo 'Invalid request method.';
+          }
+          ?>
+        owner: apache
+        group: apache
+        mode: '0644'
+
+    - name: Restart Apache to apply changes
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Show final status
+      debug:
+        msg: |
+          ✅ Apache + PHP Contact Form with image deployed!
+          🌐 Visit: http://{{ ansible_default_ipv4.address }}/
