@@ -1,0 +1,134 @@
+---
+- name: Setup Apache + MySQL and connect via PHP
+  hosts: webserver
+  become: true
+
+  vars:
+    db_name: website_data
+    db_user: webuser
+    db_password: webpass
+
+  tasks:
+    # Ensure YUM exists
+    - name: Check if YUM is available
+      command: which yum
+      register: yum_check
+      failed_when: yum_check.rc != 0
+
+    # Install Apache, PHP, and MySQL (MariaDB)
+    - name: Install Apache, PHP, and MariaDB
+      yum:
+        name:
+          - httpd
+          - mariadb-server
+          - php
+          - php-mysqlnd
+        state: present
+
+    # Start and enable Apache
+    - name: Start Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    # Start and enable MariaDB
+    - name: Start MariaDB
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    # Create MySQL database
+    - name: Create MySQL database
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+
+    # Create MySQL user
+    - name: Create MySQL user
+      mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        state: present
+
+    # Create MySQL table
+    - name: Create table in database
+      mysql_query:
+        login_user: root
+        query: |
+          CREATE TABLE IF NOT EXISTS {{ db_name }}.submissions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100),
+            email VARCHAR(100)
+          );
+
+    # Deploy index.html form
+    - name: Deploy form.html
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Submit Info</title>
+          </head>
+          <body>
+              <h1>Hello! Welcome to krnetwork cloud 🖐️</h1>
+              <form action="submit.php" method="POST">
+                  <label>Name: <input type="text" name="name" required></label><br><br>
+                  <label>Email: <input type="email" name="email" required></label><br><br>
+                  <input type="submit" value="Submit">
+              </form>
+              <br>
+              <a href="https://krnetworkcloudnimanvihar.example.com">krnetwork cloud niman vihar</a><br>
+              <a href="https://www.youtube.com/channel/UCxxxxxxx">Linux Wale Gure Ji YouTube Videos</a>
+          </body>
+          </html>
+        owner: apache
+        group: apache
+        mode: '0644'
+
+    # Deploy submit.php to handle form data and insert into DB
+    - name: Deploy submit.php script
+      copy:
+        dest: /var/www/html/submit.php
+        content: |
+          <?php
+          $conn = new mysqli("localhost", "{{ db_user }}", "{{ db_password }}", "{{ db_name }}");
+
+          if ($conn->connect_error) {
+              die("Connection failed: " . $conn->connect_error);
+          }
+
+          if ($_SERVER["REQUEST_METHOD"] == "POST") {
+              $name = $_POST['name'];
+              $email = $_POST['email'];
+
+              $stmt = $conn->prepare("INSERT INTO submissions (name, email) VALUES (?, ?)");
+              $stmt->bind_param("ss", $name, $email);
+              $stmt->execute();
+              $stmt->close();
+
+              echo "✅ Data submitted successfully!";
+          }
+          $conn->close();
+          ?>
+        owner: apache
+        group: apache
+        mode: '0644'
+
+    # Restart Apache to apply PHP setup
+    - name: Restart Apache to apply changes
+      service:
+        name: httpd
+        state: restarted
+
+    # Debug final message
+    - name: Display status and link
+      debug:
+        msg: |
+          ✅ Apache and MySQL are running
+          📄 Visit: http://192.168.1.100/index.html to submit data
+
