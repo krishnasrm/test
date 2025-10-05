@@ -20,17 +20,6 @@
         state: present
       when: httpd_check.rc != 0
 
-    - name: Check if firewalld is active
-      shell: systemctl is-active firewalld
-      register: firewalld_status
-      ignore_errors: yes
-      
-    - name: Reload firewalld if active
-      service:
-        name: firewalld
-        state: reloaded
-      when: firewalld_status.stdout == "active"
-
     - name: Install PHP and related packages
       yum:
         name:
