@@ -1,14 +1,16 @@
 ---
-- name: Setup Apache + MySQL and connect via PHP
+- name: Setup Apache, PHP, and MySQL with a working contact form
   hosts: webserver
   become: true
 
   vars:
-    db_name: website_data
-    db_user: webuser
-    db_password: webpass
+    db_name: contact_db
+    db_user: root
+    db_password: '123'  # You can vault this in production
+    allowed_host: '192.168.1.14'  # IP allowed to connect to DB
 
   tasks:
+
     - name: Install Apache, PHP, and MariaDB
       yum:
         name:
@@ -30,78 +32,107 @@
         state: started
         enabled: yes
 
+    - name: Set MySQL root password and secure installation (simulate mysql_secure_installation)
+      community.mysql.mysql_user:
+        name: root
+        host_all: true
+        password: "{{ db_password }}"
+        login_unix_socket: /var/lib/mysql/mysql.sock
+
+    - name: Grant remote privileges to root from allowed host
+      community.mysql.mysql_user:
+        name: root
+        host: "{{ allowed_host }}"
+        password: "{{ db_password }}"
+        priv: "*.*:ALL,GRANT"
+        state: present
+        login_user: root
+        login_password: "{{ db_password }}"
+
     - name: Create MySQL database
       community.mysql.mysql_db:
         name: "{{ db_name }}"
         state: present
         login_user: root
+        login_password: "{{ db_password }}"
 
-    - name: Create MySQL user with privileges
-      community.mysql.mysql_user:
-        name: "{{ db_user }}"
-        password: "{{ db_password }}"
-        priv: "{{ db_name }}.*:ALL"
-        state: present
-        login_user: root
-
-    - name: Create table in database
+    - name: Create table 'contacts' in database
       community.mysql.mysql_query:
         login_user: root
+        login_password: "{{ db_password }}"
         query: |
-          CREATE TABLE IF NOT EXISTS {{ db_name }}.submissions (
+          CREATE TABLE IF NOT EXISTS {{ db_name }}.contacts (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100),
-            email VARCHAR(100)
+            phone VARCHAR(15)
           );
 
-    - name: Deploy index.html with form
+    - name: Deploy contact form (index.html)
       copy:
         dest: /var/www/html/index.html
         content: |
           <!DOCTYPE html>
           <html>
           <head>
-              <title>Submit Info</title>
+            <title>Contact Form</title>
+            <meta charset="UTF-8">
           </head>
           <body>
-              <h1>Hello! Welcome to krnetwork cloud 🖐️</h1>
-              <form action="submit.php" method="POST">
-                  <label>Name: <input type="text" name="name" required></label><br><br>
-                  <label>Email: <input type="email" name="email" required></label><br><br>
-                  <input type="submit" value="Submit">
-              </form>
-              <br>
-              <a href="https://krnetworkcloudnimanvihar.example.com">krnetwork cloud niman vihar</a><br>
-              <a href="https://www.youtube.com/channel/UCxxxxxxx">Linux Wale Gure Ji YouTube Videos</a>
+            <h2>Enter Your Contact Info</h2>
+            <form action="submit.php" method="POST">
+              <label for="name">Name:</label><br>
+              <input type="text" id="name" name="name" required><br><br>
+              <label for="phone">Phone:</label><br>
+              <input type="text" id="phone" name="phone" required><br><br>
+              <input type="submit" value="Submit">
+            </form>
+            <br>
+            <a href="https://krnetworkcloudnimanvihar.example.com">krnetwork cloud niman vihar</a><br>
+            <a href="https://www.youtube.com/channel/UCxxxxxxx">Linux Wale Gure Ji YouTube Videos</a>
           </body>
           </html>
         owner: apache
         group: apache
         mode: '0644'
 
-    - name: Deploy submit.php script
+    - name: Deploy PHP backend (submit.php)
       copy:
         dest: /var/www/html/submit.php
         content: |
           <?php
-          $conn = new mysqli("localhost", "{{ db_user }}", "{{ db_password }}", "{{ db_name }}");
+          if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+              $name = htmlspecialchars(strip_tags(trim($_POST['name'] ?? '')));
+              $phone = trim($_POST['phone'] ?? '');
 
-          if ($conn->connect_error) {
-              die("Connection failed: " . $conn->connect_error);
-          }
+              if (empty($name) || empty($phone)) {
+                  die('Name and phone are required.');
+              }
+              if (!preg_match('/^[0-9]{10}$/', $phone)) {
+                  die('Phone must be a 10-digit number.');
+              }
 
-          if ($_SERVER["REQUEST_METHOD"] == "POST") {
-              $name = $_POST['name'];
-              $email = $_POST['email'];
+              $conn = new mysqli("localhost", "{{ db_user }}", "{{ db_password }}", "{{ db_name }}");
+              if ($conn->connect_error) {
+                  die('Connection failed: ' . htmlspecialchars($conn->connect_error));
+              }
 
-              $stmt = $conn->prepare("INSERT INTO submissions (name, email) VALUES (?, ?)");
-              $stmt->bind_param("ss", $name, $email);
-              $stmt->execute();
+              $stmt = $conn->prepare("INSERT INTO contacts (name, phone) VALUES (?, ?)");
+              if (!$stmt) {
+                  die('Prepare failed: ' . htmlspecialchars($conn->error));
+              }
+              $stmt->bind_param('ss', $name, $phone);
+
+              if ($stmt->execute()) {
+                  echo 'Thank you! Your info has been recorded.';
+              } else {
+                  echo 'Error saving data: ' . htmlspecialchars($stmt->error);
+              }
+
               $stmt->close();
-
-              echo "✅ Data submitted successfully!";
+              $conn->close();
+          } else {
+              echo 'Invalid request method.';
           }
-          $conn->close();
           ?>
         owner: apache
         group: apache
@@ -115,5 +146,6 @@
     - name: Show final status
       debug:
         msg: |
-          ✅ Apache and MySQL setup complete!
-          🌐 Visit the form at: http://192.168.1.100/
+          ✅ Apache + MySQL + PHP Contact Form Deployed!
+          🌐 Visit: http://192.168.1.100/
+          📬 Data will be stored in MySQL → contact_db.contacts
