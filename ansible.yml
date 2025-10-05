@@ -33,7 +33,7 @@
         enabled: yes
 
     - name: Set MySQL root password and secure installation (simulate mysql_secure_installation)
-      community.mysql.mysql_user:
+      community.mysql.mysql:
         name: root
         host_all: true
         password: "{{ db_password }}"
