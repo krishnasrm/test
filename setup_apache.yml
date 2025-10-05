@@ -24,7 +24,23 @@
         name: httpd
         enabled: yes
 
-    - name: Create index.html with greeting and useful links
+    - name: Create images directory in web root
+      file:
+        path: /var/www/html/images
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy screenshot image to web server
+      copy:
+        src: "Screenshot 2025-09-14 160543.png"
+        dest: /var/www/html/images/Screenshot_2025-09-14_160543.png
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create index.html with greeting and image
       copy:
         dest: /var/www/html/index.html
         content: |
@@ -36,9 +52,10 @@
           </head>
           <body>
               <h1>Hello, Welcome to our Apache Web Server!</h1>
+              <img src="images/Screenshot_2025-09-14_160543.png" alt="Screenshot" style="max-width:600px; height:auto;">
               <p>Here are some useful links:</p>
               <ul>
-                  <li><a href="https://krnetworkcloud.org/?srsltid=AfmBOopubFVT0ibGTW4A-fw724fgBt9_oVf4qd4IroSmhxxJmx6M5CO5</a></li>
+                  <li><a href="https://krnetworkcloud.org/?srsltid=AfmBOopubFVT0ibGTW4A-fw724fgBt9_oVf4qd4IroSmhxxJmx6M5CO5" target="_blank">KR Network Cloud</a></li>
                   <li><a href="https://www.youtube.com/channel/UCxxxxxxx" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
               </ul>
               <p>Have a great day!</p>
