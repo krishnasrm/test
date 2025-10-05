@@ -1,111 +1,51 @@
 ---
-- name: Setup Apache and PHP with a working contact form and image
+- name: Setup Apache Web Server on 192.168.1.100
   hosts: webserver
   become: true
 
-  vars:
-    krnetworkcloud_url: "https://krnetworkcloud.org/?srsltid=AfmBOopc_aoC7okycWr10-cdu3zZGJKH5SkzGMbVzQ6D9rLvXPbhjjWO"
-    youtube_url: "https://www.youtube.com/channel/UCxxxxxxx"
-
   tasks:
+    - name: Check if YUM is available
+      command: which yum
+      register: yum_check
+      failed_when: yum_check.rc != 0
 
-    - name: Check if httpd is installed
-      shell: rpm -q httpd
-      register: httpd_check
-      ignore_errors: yes
-
-    - name: Install httpd if not installed
+    - name: Install Apache (httpd) if not already present
       yum:
         name: httpd
         state: present
-      when: httpd_check.rc != 0
 
-    - name: Install PHP and related packages
-      yum:
-        name:
-          - php
-          - php-mysqlnd
-        state: present
-
-    - name: Start and enable Apache
+    - name: Ensure httpd service is started
       service:
         name: httpd
         state: started
+
+    - name: Enable httpd service at boot
+      service:
+        name: httpd
         enabled: yes
 
-    - name: Create images directory in web root
-      file:
-        path: /var/www/html/images
-        state: directory
-        owner: apache
-        group: apache
-        mode: '0755'
-
-    - name: Copy screenshot image to web directory
-      copy:
-        src: "cScreenshot 2025-09-14 160543.png"
-        dest: /var/www/html/images/cScreenshot_2025-09-14_160543.png
-        owner: apache
-        group: apache
-        mode: '0644'
-
-    - name: Deploy contact form (index.html) with image included
+    - name: Create index.html with greeting and useful links
       copy:
         dest: /var/www/html/index.html
         content: |
           <!DOCTYPE html>
-          <html>
+          <html lang="en">
           <head>
-            <title>Contact Form</title>
-            <meta charset="UTF-8">
+              <meta charset="UTF-8">
+              <title>Welcome to Apache Server</title>
           </head>
           <body>
-            <h2>Enter Your Contact Info</h2>
-
-            <!-- Show image -->
-            <img src="images/cScreenshot_2025-09-14_160543.png" alt="Screenshot" style="max-width:600px; height:auto;"><br><br>
-
-            <form action="submit.php" method="POST">
-              <label for="name">Name:</label><br>
-              <input type="text" id="name" name="name" required><br><br>
-              <label for="phone">Phone:</label><br>
-              <input type="text" id="phone" name="phone" required><br><br>
-              <input type="submit" value="Submit">
-            </form>
-
-            <br>
-            <a href="{{ krnetworkcloud_url }}">krnetwork cloud niman vihar</a><br>
-            <a href="{{ youtube_url }}">Linux Wale Gure Ji YouTube Videos</a>
+              <h1>Hello, Welcome to our Apache Web Server!</h1>
+              <p>Here are some useful links:</p>
+              <ul>
+                  <li><a href="https://krnetworkcloudnimanvihar.example.com" target="_blank">krnetwork cloud niman vihar</a></li>
+                  <li><a href="https://www.youtube.com/channel/UCxxxxxxx" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
+              </ul>
+              <p>Have a great day!</p>
           </body>
           </html>
-        owner: apache
-        group: apache
-        mode: '0644'
-
-    - name: Deploy PHP backend (submit.php)
-      copy:
-        dest: /var/www/html/submit.php
-        content: |
-          <?php
-          if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-              $name = htmlspecialchars(strip_tags(trim($_POST['name'] ?? '')));
-              $phone = trim($_POST['phone'] ?? '');
-
-              if (empty($name) || empty($phone)) {
-                  die('Name and phone are required.');
-              }
-              if (!preg_match('/^[0-9]{10}$/', $phone)) {
-                  die('Phone must be a 10-digit number.');
-              }
-
-              // Since no DB is configured, just thank user.
-              echo 'Thank you! Your info has been recorded (DB disabled).';
-          } else {
-              echo 'Invalid request method.';
-          }
-          ?>
-        owner: apache
-        group: apache
+        owner: root
+        group: root
         mode: '0644'
 
     - name: Restart Apache to apply changes
@@ -113,8 +53,20 @@
         name: httpd
         state: restarted
 
-    - name: Show final status
+    - name: Confirm Apache is enabled
+      command: systemctl is-enabled httpd
+      register: enabled_status
+      changed_when: false
+
+    - name: Confirm Apache is running
+      command: systemctl is-active httpd
+      register: active_status
+      changed_when: false
+
+    - name: Show final Apache status
       debug:
         msg: |
-          ✅ Apache + PHP Contact Form with image deployed!
-          🌐 Visit: http://{{ ansible_default_ipv4.address }}/
+          ✅ Apache Status on 192.168.1.100
+          - Enabled at boot: {{ enabled_status.stdout }}
+          - Currently running: {{ active_status.stdout }}
+          - Access via: http://192.168.1.100
