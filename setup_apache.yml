@@ -1,5 +1,5 @@
 ---
-- name: Setup Apache Web Server on 192.168.1.100
+- name: Setup Apache Web Server on 192.168.1.28
   hosts: webserver
   become: true
 
@@ -14,14 +14,10 @@
         name: httpd
         state: present
 
-    - name: Ensure httpd service is started
+    - name: Ensure httpd service is started and enabled
       service:
         name: httpd
         state: started
-
-    - name: Enable httpd service at boot
-      service:
-        name: httpd
         enabled: yes
 
     - name: Create images directory in web root
