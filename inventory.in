@@ -1,2 +1,2 @@
 [webserver]
-192.168.1.28  ansible_user=root ansible_password=111
+192.168.1.28 
