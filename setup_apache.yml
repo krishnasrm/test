@@ -1,4 +1,4 @@
-----
+---
 - name: Setup Apache Web Server on 192.168.1.28
   hosts: all
   become: true
@@ -20,10 +20,18 @@
         state: started
         enabled: yes
 
-    - name: Copy HTML code from local file (html-code) to index.html
+    - name: Copy HTML file to index.html
       copy:
         src: html-code
         dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy video file to web server
+      copy:
+        src: 115534-704906218_medium.mp4
+        dest: /var/www/html/115534-704906218_medium.mp4
         owner: root
         group: root
         mode: '0644'
@@ -49,4 +57,5 @@
           ✅ Apache Status on 192.168.1.28
           - Enabled at boot: {{ enabled_status.stdout }}
           - Currently running: {{ active_status.stdout }}
-          - Access via: http://192.168.1.28
+          - Access site via: http://192.168.1.28
+          - Access video via: http://192.168.1.28/115534-704906218_medium.mp4
