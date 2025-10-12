@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Welcome to Apache Server</title>
 </head>
 <body>
     <h1>Hello, Welcome to our Apache Web Server!</h1>
 
-    <p>We're glad to have you here! 🎉</p>
+    <img src="images/krishna.png" alt="Krishna Image" style="max-width:600px; height:auto;" />
 
+    <p>Here are some useful links:</p>
     <ul>
-        <li><a href="https://www.youtube.com/@shikai_7" target="_blank">Visit Shikai_7 on YouTube 🚀</a></li>
+        <li><a href="https://krnetworkcloud.org/?srsltid=AfmBOopubFVT0ibGTW4A-fw724fgBt9_oVf4qd4IroSmhxxJmx6M5CO5" target="_blank">KR Network Cloud</a></li>
+        <li><a href="https://www.youtube.com/@shikai_7" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
     </ul>
 
-    <h2>Watch Our Latest Video</h2>
-    <video width="600" controls>
-        <source src="115534-704906218_medium.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-
-    <p>Don’t forget to like, share, and subscribe! 😄</p>
+    <p>Have a great day!</p>
 </body>
 </html>
