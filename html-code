@@ -8,14 +8,17 @@
     <h1>Hello, Welcome to our Apache Web Server!</h1>
 
     <p>We're glad to have you here! 🎉</p>
-    <p>If you're interested in tech tutorials, coding, or just want to explore some cool content, check out our YouTube channel below:</p>
 
     <ul>
         <li><a href="https://www.youtube.com/@shikai_7" target="_blank">Visit Shikai_7 on YouTube 🚀</a></li>
     </ul>
 
-    <p>Don’t forget to like, share, and subscribe if you enjoy the content! 😄</p>
-    
-    <p>Have a great day!</p>
+    <h2>Watch Our Latest Video</h2>
+    <video width="600" controls>
+        <source src="115534-704906218_medium.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <p>Don’t forget to like, share, and subscribe! 😄</p>
 </body>
 </html>
