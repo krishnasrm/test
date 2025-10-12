@@ -1,4 +1,4 @@
----
+----
 - name: Setup Apache Web Server on 192.168.1.28
   hosts: all
   become: true
@@ -19,22 +19,6 @@
         name: httpd
         state: started
         enabled: yes
-
-    - name: Create images directory in web root
-      file:
-        path: /var/www/html/images
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-
-    - name: Copy krishna.png image to web server
-      copy:
-        src: "krishna.png"
-        dest: /var/www/html/images/krishna.png
-        owner: root
-        group: root
-        mode: '0644'
 
     - name: Copy HTML code from local file (html-code) to index.html
       copy:
