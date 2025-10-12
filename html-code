@@ -7,11 +7,14 @@
 <body>
     <h1>Hello, Welcome to our Apache Web Server!</h1>
 
-    <img src="images/krishna.png" alt="Krishna Image" style="max-width:600px; height:auto;" />
+    <h2>Watch the video below:</h2>
+    <video width="640" height="360" controls>
+        <source src="videos/115534-704906218_medium.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-    <p>Here are some useful links:</p>
+    <p>Here is a useful link:</p>
     <ul>
-        <li><a href="https://krnetworkcloud.org/?srsltid=AfmBOopubFVT0ibGTW4A-fw724fgBt9_oVf4qd4IroSmhxxJmx6M5CO5" target="_blank">KR Network Cloud</a></li>
         <li><a href="https://www.youtube.com/@shikai_7" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
     </ul>
 
