@@ -7,17 +7,24 @@
 <body>
     <h1>Hello, Welcome to our Apache Web Server!</h1>
 
+    <p>We're excited to have you here. Explore the content and enjoy the video below!</p>
+
     <h2>Watch the video below:</h2>
     <video width="640" height="360" controls>
         <source src="videos/115534-704906218_medium.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
-    <p>Here is a useful link:</p>
+    <p>Did you know? Apache is one of the most popular web servers in the world, powering millions of websites!</p>
+
+    <p>Feel free to explore more:</p>
     <ul>
-        <li><a href="https://www.youtube.com/@shikai_7" target="_blank">Linux Wale Gure Ji YouTube Videos</a></li>
+        <li><a href="https://www.apache.org/" target="_blank">Official Apache Website</a></li>
+        <li><a href="https://www.youtube.com/@shikai_7" target="_blank">shikai_7 - My YouTube Channel</a></li>
     </ul>
 
-    <p>Have a great day!</p>
+    <p>If you have any questions or want to learn more about web development, don't hesitate to reach out!</p>
+
+    <p>Thanks for visiting — have an amazing day ahead!</p>
 </body>
 </html>
