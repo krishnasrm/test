@@ -20,18 +20,26 @@
         state: started
         enabled: yes
 
-    - name: Copy HTML file to index.html
+    - name: Create images directory in web root
+      file:
+        path: /var/www/html/images
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy krishna.png image to web server
       copy:
-        src: html-code
-        dest: /var/www/html/index.html
+        src: "krishna.png"
+        dest: /var/www/html/images/krishna.png
         owner: root
         group: root
         mode: '0644'
 
-    - name: Copy video file to web server
+    - name: Copy HTML code from local file (html-code) to index.html
       copy:
-        src: 115534-704906218_medium.mp4
-        dest: /var/www/html/115534-704906218_medium.mp4
+        src: html-code
+        dest: /var/www/html/index.html
         owner: root
         group: root
         mode: '0644'
@@ -57,5 +65,4 @@
           ✅ Apache Status on 192.168.1.28
           - Enabled at boot: {{ enabled_status.stdout }}
           - Currently running: {{ active_status.stdout }}
-          - Access site via: http://192.168.1.28
-          - Access video via: http://192.168.1.28/115534-704906218_medium.mp4
+          - Access via: http://192.168.1.28
