@@ -3,28 +3,139 @@
 <head>
     <meta charset="UTF-8" />
     <title>Welcome to Apache Server</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 30px;
+            color: #fff; /* White text to contrast with the background */
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: rgbGlow 5s infinite; /* Animation for changing background colors */
+        }
+
+        /* Define the RGB lighting animation */
+        @keyframes rgbGlow {
+            0% {
+                background: rgb(255, 0, 0); /* Red */
+            }
+            25% {
+                background: rgb(0, 255, 0); /* Green */
+            }
+            50% {
+                background: rgb(0, 0, 255); /* Blue */
+            }
+            75% {
+                background: rgb(255, 255, 0); /* Yellow */
+            }
+            100% {
+                background: rgb(255, 0, 255); /* Magenta */
+            }
+        }
+
+        /* Header styling */
+        h1 {
+            color: #fff;
+            text-align: center;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Glow effect on text */
+            margin-bottom: 20px;
+        }
+
+        /* Subheader styling */
+        h2 {
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* Paragraphs styling */
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #fff;
+            margin: 15px 0;
+        }
+
+        /* Video container */
+        video {
+            display: block;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Link styling */
+        a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Link hover effect */
+        a:hover {
+            color: #f39c12;
+            text-decoration: underline;
+        }
+
+        /* Unordered list (links section) */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+
+        ul li {
+            margin: 10px 0;
+        }
+
+        /* Footer message styling */
+        .footer {
+            font-size: 16px;
+            color: #fff;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* A card-like container for the main content */
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+    </style>
 </head>
 <body>
-    <h1>Hello, Welcome to our Apache Web Server!</h1>
+    <div class="container">
+        <h1>Hello, Welcome to our Apache Web Server!</h1>
+        <p>We're excited to have you here. Explore the content and enjoy the video below!</p>
 
-    <p>We're excited to have you here. Explore the content and enjoy the video below!</p>
+        <h2>Watch the video below:</h2>
+        <video width="640" height="360" controls>
+            <source src="videos/115534-704906218_medium.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 
-    <h2>Watch the video below:</h2>
-    <video width="640" height="360" controls>
-        <source src="videos/115534-704906218_medium.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+        <p>Did you know? Apache is one of the most popular web servers in the world, powering millions of websites!</p>
 
-    <p>Did you know? Apache is one of the most popular web servers in the world, powering millions of websites!</p>
+        <p>Feel free to explore more:</p>
+        <ul>
+            <li><a href="https://www.apache.org/" target="_blank">Official Apache Website</a></li>
+            <li><a href="https://www.youtube.com/@shikai_7" target="_blank">shikai_7 - My YouTube Channel</a></li>
+        </ul>
 
-    <p>Feel free to explore more:</p>
-    <ul>
-        <li><a href="https://www.apache.org/" target="_blank">Official Apache Website</a></li>
-        <li><a href="https://www.youtube.com/@shikai_7" target="_blank">shikai_7 - My YouTube Channel</a></li>
-    </ul>
+        <p>If you have any questions or want to learn more about web development, don't hesitate to reach out!</p>
 
-    <p>If you have any questions or want to learn more about web development, don't hesitate to reach out!</p>
-
-    <p>Thanks for visiting — have an amazing day ahead!</p>
+        <p class="footer">Thanks for visiting — have an amazing day ahead!</p>
+    </div>
 </body>
 </html>
