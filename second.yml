@@ -1,56 +1,90 @@
+---
 - name: Setup Apache Web Server on Jenkins Slave
   hosts: localhost
-  connection: local
   become: true
+  gather_facts: true
 
   tasks:
+
     - name: Check if YUM is available
       command: which yum
       register: yum_check
       failed_when: yum_check.rc != 0
 
-    - name: Install Apache (httpd)
+    - name: Install Apache (httpd) if not already present
       yum:
         name: httpd
         state: present
+      when: not ansible_check_mode
 
     - name: Ensure httpd service is started and enabled
       service:
         name: httpd
         state: started
         enabled: yes
+      when: not ansible_check_mode
 
-    - name: Create images directory
+    - name: Create images directory in web root
       file:
         path: /var/www/html/images
         state: directory
+        owner: root
+        group: root
         mode: '0755'
 
-    - name: Copy image
+    - name: Copy krishna.png image to web server
       copy:
-        src: krishna.png
+        src: "krishna.png"
         dest: /var/www/html/images/krishna.png
+        owner: root
+        group: root
         mode: '0644'
 
-    - name: Create videos directory
+    - name: Create videos directory in web root
       file:
         path: /var/www/html/videos
         state: directory
+        owner: root
+        group: root
         mode: '0755'
 
-    - name: Copy video
+    - name: Copy video file to web server
       copy:
-        src: 115534-704906218_medium.mp4
+        src: "115534-704906218_medium.mp4"
         dest: /var/www/html/videos/115534-704906218_medium.mp4
+        owner: root
+        group: root
         mode: '0644'
 
-    - name: Copy HTML file
+    - name: Copy HTML code from local file (html-code) to index.html
       copy:
         src: html-code
         dest: /var/www/html/index.html
+        owner: root
+        group: root
         mode: '0644'
 
-    - name: Restart Apache
+    - name: Restart Apache to apply changes
       service:
         name: httpd
         state: restarted
+      when: not ansible_check_mode
+
+    - name: Confirm Apache is enabled
+      command: systemctl is-enabled httpd
+      register: enabled_status
+      changed_when: false
+
+    - name: Confirm Apache is running
+      command: systemctl is-active httpd
+      register: active_status
+      changed_when: false
+
+    - name: Show final Apache status
+      debug:
+        msg: |
+          ✅ Apache Status on Jenkins Slave
+          - Enabled at boot: {{ enabled_status.stdout }}
+          - Currently running: {{ active_status.stdout }}
+          - Access image via: http://{{ ansible_default_ipv4.address }}/images/krishna.png
+          - Access video via: http://{{ ansible_default_ipv4.address }}/videos/115534-704906218_medium.mp4
