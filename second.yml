@@ -15,14 +15,12 @@
       yum:
         name: httpd
         state: present
-      when: not ansible_check_mode
 
     - name: Ensure httpd service is started and enabled
       service:
         name: httpd
         state: started
         enabled: yes
-      when: not ansible_check_mode
 
     - name: Create images directory in web root
       file:
@@ -68,7 +66,6 @@
       service:
         name: httpd
         state: restarted
-      when: not ansible_check_mode
 
     - name: Confirm Apache is enabled
       command: systemctl is-enabled httpd
@@ -83,7 +80,7 @@
     - name: Show final Apache status
       debug:
         msg: |
-          ✅ Apache Status on 192.168.1.31
+          ✅ Apache Status on {{ inventory_hostname }}
           - Enabled at boot: {{ enabled_status.stdout }}
           - Currently running: {{ active_status.stdout }}
           - Access image via: http://{{ ansible_default_ipv4.address }}/images/krishna.png
