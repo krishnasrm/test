@@ -1,6 +1,6 @@
 ---
 - name: Setup Apache Web Server on Jenkins Slave
-  hosts: 192.168.1.31
+  hosts: webservers
   become: true
   gather_facts: true
 
@@ -83,7 +83,7 @@
     - name: Show final Apache status
       debug:
         msg: |
-          ✅ Apache Status on Jenkins Slave
+          ✅ Apache Status on 192.168.1.31
           - Enabled at boot: {{ enabled_status.stdout }}
           - Currently running: {{ active_status.stdout }}
           - Access image via: http://{{ ansible_default_ipv4.address }}/images/krishna.png
