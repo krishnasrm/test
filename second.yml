@@ -1,0 +1,56 @@
+- name: Setup Apache Web Server on Jenkins Slave
+  hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+    - name: Check if YUM is available
+      command: which yum
+      register: yum_check
+      failed_when: yum_check.rc != 0
+
+    - name: Install Apache (httpd)
+      yum:
+        name: httpd
+        state: present
+
+    - name: Ensure httpd service is started and enabled
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Create images directory
+      file:
+        path: /var/www/html/images
+        state: directory
+        mode: '0755'
+
+    - name: Copy image
+      copy:
+        src: krishna.png
+        dest: /var/www/html/images/krishna.png
+        mode: '0644'
+
+    - name: Create videos directory
+      file:
+        path: /var/www/html/videos
+        state: directory
+        mode: '0755'
+
+    - name: Copy video
+      copy:
+        src: 115534-704906218_medium.mp4
+        dest: /var/www/html/videos/115534-704906218_medium.mp4
+        mode: '0644'
+
+    - name: Copy HTML file
+      copy:
+        src: html-code
+        dest: /var/www/html/index.html
+        mode: '0644'
+
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
