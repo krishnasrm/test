@@ -1,4 +1,8 @@
+[dev]
+node-A ansible_host=192.168.1.139
+
+[prod]
+node-B ansible_host=192.168.1.133
+
 [webservers]
 192.168.1.44
-node-A
-node-B
