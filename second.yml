@@ -1,6 +1,6 @@
 ---
 - name: Setup Apache Web Server on Jenkins Slave
-  hosts: webservers
+  hosts: webservers,prod,dev
   become: true
   gather_facts: true
 
